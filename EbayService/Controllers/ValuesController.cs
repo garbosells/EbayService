@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.ApplicationInsights;
 
 namespace EbayService.Controllers
 {
@@ -10,11 +11,14 @@ namespace EbayService.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        TelemetryClient telemetryClient = new TelemetryClient();
+
         // GET api/values
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2" };
+            telemetryClient.TrackEvent("CustomEvent", new Dictionary<string, string> { { "someVar", "value"} });
+            return new string[] { "boop", "value2" };
         }
 
         // GET api/values/5

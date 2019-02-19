@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <ApplicationInsightsResourceId>/subscriptions/9d193410-910c-4f60-add3-c4f246dc7907/resourcegroups/ebayservice/providers/microsoft.insights/components/EbayService</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/9d193410-910c-4f60-add3-c4f246dc7907/resourcegroups/ebayservice/providers/microsoft.insights/components/EbayService</ApplicationInsightsAnnotationResourceId>
+    <UserSecretsId>c2b5e3f9-4703-4c71-bd12-5fd5424c7135</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
