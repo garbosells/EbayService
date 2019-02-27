@@ -7,5 +7,7 @@ namespace EbayService
 {
     public class AppSettings
     {
+        public string EbayBaseURL { get; set; }
+        public Dictionary<string,string> EbayAuth { get; set; }
     }
 }
