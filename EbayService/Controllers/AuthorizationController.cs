@@ -10,17 +10,25 @@ using eBay.ApiClient.Auth.OAuth2.Model;
 
 namespace EbayService.Controllers
 {
-  [ApiController]
-  public class AuthorizationController : ControllerBase
-  {
-    // GET api/GetLocations
-    [HttpGet]
-    [Route("api/Authorization/GenerateUserAuthorizationUrl")]
-    public Task<string> GenerateUserAuthorizationUrl()
+    [ApiController]
+    public class AuthorizationController : ControllerBase
     {
-      OAuth2Api oAuth = new OAuth2Api();
-      string url = oAuth.GenerateUserAuthorizationUrl(OAuthEnvironment.SANDBOX, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, null);
-      return Task.FromResult<string>(url);
+        [HttpGet]
+        [Route("api/Authorization/GenerateUserAuthorizationUrl")]
+        public Task<string> GenerateUserAuthorizationUrl()
+        {
+            OAuth2Api oAuth = new OAuth2Api();
+            string url = oAuth.GenerateUserAuthorizationUrl(OAuthEnvironment.SANDBOX, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, "test");
+            return Task.FromResult<string>(url);
+        }
+
+        [HttpGet]
+        [Route("api/Authorization/GetAuthTokenFromCode")]
+        public Task<OAuthResponse> GetAuthTokenFromCode(string code)
+        {
+            OAuth2Api oAuth = new OAuth2Api();
+            var response = oAuth.ExchangeCodeForAccessToken(OAuthEnvironment.SANDBOX, code);
+            return Task.FromResult<OAuthResponse>(response);
+        }
     }
-  }
 }
