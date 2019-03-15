@@ -18,7 +18,7 @@ namespace EbayService.Controllers
         public Task<string> GenerateUserAuthorizationUrl()
         {
             OAuth2Api oAuth = new OAuth2Api();
-            string url = oAuth.GenerateUserAuthorizationUrl(OAuthEnvironment.SANDBOX, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, "test");
+            string url = oAuth.GenerateUserAuthorizationUrl(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, "test");
             return Task.FromResult<string>(url);
         }
 
@@ -27,8 +27,10 @@ namespace EbayService.Controllers
         public Task<OAuthResponse> GetAuthTokenFromCode(string code)
         {
             OAuth2Api oAuth = new OAuth2Api();
-            var response = oAuth.ExchangeCodeForAccessToken(OAuthEnvironment.SANDBOX, code);
+            var response = oAuth.ExchangeCodeForAccessToken(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, code);
             return Task.FromResult<OAuthResponse>(response);
         }
+
+
     }
 }
