@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using EbayService.Models;
 
 namespace EbayService
 {
     public class AppSettings
     {
         public string EbayBaseURL { get; set; }
-        public Dictionary<string,string> EbayAuth { get; set; }
+        public EbayAuth EbayAuth { get; set; }
+        public string EBayAuthCallbackKey { get; set; }
     }
 }

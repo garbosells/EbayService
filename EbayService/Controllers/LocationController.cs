@@ -29,20 +29,20 @@ namespace EbayService.Controllers
         {
             telemetryClient.TrackEvent("GetLocations");
             string baseUrl = settings.Value.EbayBaseURL;
-            string authToken = settings.Value.EbayAuth["UserToken"];
+            //string authToken = settings.Value.EbayAuth["UserToken"];
 
-            using (HttpClient client = new HttpClient())
-            {                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
+            //using (HttpClient client = new HttpClient())
+            //{                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", authToken);
 
-                var req_uri = baseUrl + "location/?";
-                using (HttpResponseMessage res = await client.GetAsync(req_uri))
-                using (HttpContent content = res.Content)
-                {
-                    string data = await content.ReadAsStringAsync();
-                    var response = SimpleJson.SimpleJson.DeserializeObject<EbayLocationResponse>(data);
-                    return response;
-                }
-            }
+            //    var req_uri = baseUrl + "location/?";
+            //    using (HttpResponseMessage res = await client.GetAsync(req_uri))
+            //    using (HttpContent content = res.Content)
+            //    {
+            //        string data = await content.ReadAsStringAsync();
+            //        var response = SimpleJson.SimpleJson.DeserializeObject<EbayLocationResponse>(data);
+            //        return response;
+            //    }
+            //}
         }
     }
 }
