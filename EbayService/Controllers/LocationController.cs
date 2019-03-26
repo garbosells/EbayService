@@ -29,7 +29,7 @@ namespace EbayService.Controllers
         {
             telemetryClient.TrackEvent("GetLocations");
             string baseUrl = settings.Value.EbayBaseURL;
-            string authToken = string.Empty; //settings.Value.EbayAuth["UserToken"];
+            string authToken = settings.Value.EbayAuth.UserToken.Token; //TODO: check if valid, use refresh token to get new token if expired, if refresh token expired need to handle that too
 
             using (HttpClient client = new HttpClient())
             {

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eBay.ApiClient.Auth.OAuth2;
 using EbayService.Managers;
 using EbayService.Managers.Interfaces;
+using EbayService.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 namespace EbayService
 {
@@ -38,7 +40,10 @@ namespace EbayService
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
       services.Configure<AppSettings>(Configuration);
       services.AddTransient<IAuthorizationManager, AuthorizationManager>();
-    }
+      var connection = @"Server=(localdb)\mssqllocaldb;Database=EFGetStarted.AspNetCore.NewDb;Trusted_Connection=True;ConnectRetryCount=0";
+      services.AddDbContext<DbModelContext>
+      (options => options.UseSqlServer(connection));
+        }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IHostingEnvironment env)
