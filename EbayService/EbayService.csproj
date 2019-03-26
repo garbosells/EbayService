@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <ApplicationInsightsResourceId>/subscriptions/9d193410-910c-4f60-add3-c4f246dc7907/resourcegroups/ebayservice/providers/microsoft.insights/components/EbayService</ApplicationInsightsResourceId>
     <ApplicationInsightsAnnotationResourceId>/subscriptions/9d193410-910c-4f60-add3-c4f246dc7907/resourcegroups/ebayservice/providers/microsoft.insights/components/EbayService</ApplicationInsightsAnnotationResourceId>
     <UserSecretsId>c2b5e3f9-4703-4c71-bd12-5fd5424c7135</UserSecretsId>
@@ -26,6 +26,7 @@
     <PackageReference Include="eBay.OAuth.Client" Version="1.0.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.6.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.2.3" />
     <PackageReference Include="Microsoft.VisualStudio.SlowCheetah" Version="3.2.20">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
