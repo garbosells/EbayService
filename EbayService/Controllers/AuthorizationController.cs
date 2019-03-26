@@ -9,6 +9,7 @@ using eBay.ApiClient.Auth.OAuth2;
 using eBay.ApiClient.Auth.OAuth2.Model;
 using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Options;
+using EbayService.Managers.Interfaces;
 
 namespace EbayService.Controllers
 {
@@ -17,10 +18,12 @@ namespace EbayService.Controllers
     {
         TelemetryClient telemetryClient = new TelemetryClient();
         private readonly IOptions<AppSettings> settings;
+        private readonly IAuthorizationManager authorizationManager;
 
-        public AuthorizationController(IOptions<AppSettings> settings)
+        public AuthorizationController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager)
         {
             this.settings = settings;
+            this.authorizationManager = authorizationManager;
         }
 
         //TODO: Handle unsuccessful status code(s) in response
