@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,12 +19,14 @@ namespace EbayService.Models
 
     public class Company
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long companyId { get; set; }
         public long companyEbayAuthId { get; set; }
     }
 
     public class CompanyEbayAuth
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long companyEbayAuthId { get; set; }
         public string userToken { get; set; }
         public DateTime userTokenExpiration { get; set; }
