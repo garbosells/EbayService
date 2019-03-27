@@ -11,5 +11,6 @@ namespace EbayService
         public string EbayBaseURL { get; set; }
         public EbayAuth EbayAuth { get; set; }
         public string EBayAuthCallbackKey { get; set; }
+        public Dictionary<string,string> ConnectionStrings { get; set; }
     }
 }
