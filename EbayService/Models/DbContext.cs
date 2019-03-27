@@ -13,12 +13,14 @@ namespace EbayService.Models
     : base(options)
         { }
 
+        public DbModelContext() { }
         public DbSet<Company> Companies { get; set; }
         public DbSet<CompanyEbayAuth> CompanyEbayAuths { get; set; }
     }
 
     public class Company
     {
+        public Company() { }
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long companyId { get; set; }
         public long companyEbayAuthId { get; set; }
@@ -26,6 +28,7 @@ namespace EbayService.Models
 
     public class CompanyEbayAuth
     {
+        public CompanyEbayAuth() { }
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public long companyEbayAuthId { get; set; }
         public string userToken { get; set; }
