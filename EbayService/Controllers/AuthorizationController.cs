@@ -66,8 +66,7 @@ namespace EbayService.Controllers
             {
                 OAuth2Api oAuth = new OAuth2Api();
                 response = oAuth.ExchangeCodeForAccessToken(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, code);
-                var authResponse = Task.FromResult<OAuthResponse>(response).Result;
-                authorizationManager.SetEbayAuth(authResponse.AccessToken, authResponse.RefreshToken);
+                var authResponse = Task.FromResult<OAuthResponse>(response);
             } catch (Exception ex)
             {
                 telemetryClient.TrackException(ex, new Dictionary<string, string> { { "ErrorMessage", response?.ErrorMessage } });
