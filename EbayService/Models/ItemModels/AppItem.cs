@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace EbayService.Models.ItemModels
 {
   /// <summary>
-  /// Represents and Item created in the app
+  /// Represents an Item created in the app
   /// </summary>
   public class AppItem
   {
