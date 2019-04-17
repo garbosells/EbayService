@@ -1,0 +1,16 @@
+name: ebay-config
+
+# OAuth Access Tokens - https://developer.ebay.com/api-docs/static/oauth-tokens.html
+
+# UPDATE the values in this file, before running the tests
+api.sandbox.ebay.com:
+    appid: EricaAnd-GarboSel-SBX-6a6d4ee64-721b5440
+    certid: SBX-a6d4ee641e42-af54-48c3-a764-f4f7
+    devid: 502765d1-74be-4ad9-bab0-1afc624ae3d2
+    redirecturi: Erica_Anderson-EricaAnd-GarboS-qjioz
+
+api.ebay.com:
+    appid: <appid-from-developer-portal>
+    certid: <certid-from-developer-portal>
+    devid: <devid-from-developer-portal>
+    redirecturi: <redirect_uri-from-developer-portal>

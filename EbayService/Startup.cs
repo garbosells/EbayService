@@ -27,7 +27,7 @@ namespace EbayService
           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
           .AddEnvironmentVariables();
-      CredentialUtil.Load("ebay-config.yaml");
+      CredentialUtil.Load("./wwwroot/ebay-config.yaml");
 
       Configuration = builder.Build();
     }

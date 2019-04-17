@@ -1,9 +1,9 @@
+using EbayService.Controllers.ResponseObjects;
+
 namespace EbayService.Controllers
 {
-  public class GenerateUserAuthorizationUrlResponse
+  public class GenerateUserAuthorizationUrlResponse : Response
   {
-    public bool IsSuccess { get; set; }
-    public string ErrorMessage { get; set; }
     public string URL { get; set; }
   }
 }
