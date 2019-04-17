@@ -71,6 +71,10 @@ namespace EbayService.Controllers
         response = oAuth.ExchangeCodeForAccessToken(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, code);
         var authResponse = Task.FromResult<OAuthResponse>(response);
       }
+      catch(NotAuthorizedException ex)
+      {
+        telemetryClient.TrackException(ex, new Dictionary<string, string> { { "ErrorMessage", ex.Message } });
+      }
       catch (Exception ex)
       {
         telemetryClient.TrackException(ex, new Dictionary<string, string> { { "ErrorMessage", response?.ErrorMessage } });
