@@ -8,7 +8,7 @@ namespace EbayService.Models.ItemModels
   /// <summary>
   /// Represents an Item created in the app
   /// </summary>
-  public class AppItem
+  public class InventoryItem
   {
     public long ItemId { get; set; }
     public long CompanyId { get; set; }
