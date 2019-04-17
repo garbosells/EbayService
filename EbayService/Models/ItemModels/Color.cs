@@ -4,5 +4,6 @@ namespace EbayService.Models.ItemModels
   {
     public long ColorId { get; set; }
     public string ColorDescription { get; set; }
+    public string Value {get; set;}
   }
 }
