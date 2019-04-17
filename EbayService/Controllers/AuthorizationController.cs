@@ -35,18 +35,22 @@ namespace EbayService.Controllers
     /// <returns></returns>
     [HttpGet]
     [Route("api/Authorization/GenerateUserAuthorizationUrl")]
-    public async Task<string> GenerateUserAuthorizationUrlAsync()
+    public async Task<GenerateUserAuthorizationUrlResponse> GenerateUserAuthorizationUrlAsync()
     {
       try
       {
         OAuth2Api oAuth = new OAuth2Api();
         string url = oAuth.GenerateUserAuthorizationUrl(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, "test");
-        return await Task.FromResult<string>(url);
+        return await Task.FromResult<GenerateUserAuthorizationUrlResponse>(new GenerateUserAuthorizationUrlResponse { IsSuccess = true, URL = url});
       }
       catch (Exception ex)
       {
         telemetryClient.TrackException(ex);
-        return null; //TODO: handle better
+        return new GenerateUserAuthorizationUrlResponse
+        {
+          IsSuccess = false,
+          ErrorMessage = ex.Message
+        };
       }
 
     }
