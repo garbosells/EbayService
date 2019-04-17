@@ -29,7 +29,7 @@ namespace EbayService.Controllers
         {
             telemetryClient.TrackEvent("GetLocations");
             string baseUrl = settings.Value.EbayBaseURL;
-            string authToken = string.Empty; //settings.Value.EbayAuth["UserToken"];
+            string authToken = string.Empty; //settings.Value.EbayAuth["UserToken"]; TODO: fix
 
             using (HttpClient client = new HttpClient())
             {
@@ -43,7 +43,6 @@ namespace EbayService.Controllers
                     var response = SimpleJson.SimpleJson.DeserializeObject<EbayLocationResponse>(data);
                     return response;
                 }
-                //}
             }
         }
     }
