@@ -8,7 +8,7 @@ namespace EbayService.Models.ItemModels
   /// <summary>
   /// Represents an Item created in the app
   /// </summary>
-  public class InventoryItem
+  public class InventoryItem<T>
   {
     public long ItemId { get; set; }
     public long CompanyId { get; set; }
@@ -25,7 +25,7 @@ namespace EbayService.Models.ItemModels
     public long SubCategoryId { get; set; }
     public string[] Tags { get; set; } //Limit 15
     public string ShortDescription { get; set; }
-    public ItemAttribute[] ItemAttributes { get; set; }
+    public ItemAttribute<T>[] ItemAttributes { get; set; }
     public ItemDescription Description { get; set; }
     public Condition Condition { get; set; }
 

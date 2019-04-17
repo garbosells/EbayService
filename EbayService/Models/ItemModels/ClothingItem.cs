@@ -8,7 +8,7 @@ namespace EbayService.Models.ItemModels
   /// <summary>
   /// Represents a Clothing Item created in the app
   /// </summary>
-  public class ClothingItem : InventoryItem
+  public class ClothingItem<T> : InventoryItem<T>
   {
     public ClothingSize Size { get; set; }
     public ClothingMaterial Material { get; set; }
