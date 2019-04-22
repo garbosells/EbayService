@@ -18,9 +18,9 @@ namespace EbayService
 {
   public class Startup
   {
-    public IConfigurationRoot Configuration { get; set; }
+    public IConfiguration Configuration { get; set; }
 
-    public Startup(IHostingEnvironment env)
+    public Startup(IHostingEnvironment env, IConfiguration configuration)
     {
       var builder = new ConfigurationBuilder()
           .SetBasePath(env.ContentRootPath)
