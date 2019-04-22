@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 
 namespace EbayService.Util
 {
-    public class KeyStore
+    public class KeyManager
     {
         private readonly IOptions<AppSettings> appSettings;
         private readonly KeyVaultClient keyVaultClient;
         private TelemetryClient telemetryClient = new TelemetryClient();
         private static string keyVaultUrl;
 
-        public KeyStore(IOptions<AppSettings> appSettings)
+        public KeyManager(IOptions<AppSettings> appSettings)
         {
             this.appSettings = appSettings;
             keyVaultUrl = appSettings.Value.KeyVaultUrl;

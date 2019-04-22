@@ -22,9 +22,9 @@ namespace EbayService.Controllers
         private readonly IOptions<AppSettings> settings;
         private readonly IAuthorizationManager authorizationManager;
         private readonly IConfiguration configuration;
-        private readonly KeyStore keyStore;
+        private readonly KeyManager keyStore;
 
-        public AuthorizationController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager, IConfiguration configuration, KeyStore keyStore)
+        public AuthorizationController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager, IConfiguration configuration, KeyManager keyStore)
         {
             this.settings = settings;
             this.authorizationManager = authorizationManager;
