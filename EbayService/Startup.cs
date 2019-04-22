@@ -26,6 +26,7 @@ namespace EbayService
           .SetBasePath(env.ContentRootPath)
           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
           .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true, reloadOnChange: true)
+          .AddConfiguration(configuration)
           .AddEnvironmentVariables();
       CredentialUtil.Load("./wwwroot/ebay-config.yaml");
 
