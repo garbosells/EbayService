@@ -11,6 +11,7 @@ using Microsoft.ApplicationInsights;
 using Microsoft.Extensions.Options;
 using EbayService.Managers.Interfaces;
 using Microsoft.Extensions.Configuration;
+using EbayService.Util;
 
 namespace EbayService.Controllers
 {
@@ -21,12 +22,14 @@ namespace EbayService.Controllers
         private readonly IOptions<AppSettings> settings;
         private readonly IAuthorizationManager authorizationManager;
         private readonly IConfiguration configuration;
+        private readonly KeyStore keyStore;
 
-        public AuthorizationController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager, IConfiguration configuration)
+        public AuthorizationController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager, IConfiguration configuration, KeyStore keyStore)
         {
             this.settings = settings;
             this.authorizationManager = authorizationManager;
             this.configuration = configuration;
+            this.keyStore = keyStore;
         }
 
         //TODO: Handle unsuccessful status code(s) in response
@@ -97,7 +100,7 @@ namespace EbayService.Controllers
         [Route("api/Authorization/Test")]
         public void Test()
         {
-            var secret = configuration["ebay-user-token-test"];
+            var secret = keyStore.GetEbayUserTokenByCompanyId(0);
             var x = secret;
         }
     }
