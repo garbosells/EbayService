@@ -1,4 +1,5 @@
 ﻿using EbayService.Models;
+using Microsoft.ApplicationInsights;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.Extensions.Configuration;
@@ -14,37 +15,57 @@ namespace EbayService.Util
     public class KeyStore
     {
         private readonly IOptions<AppSettings> appSettings;
-        private readonly AzureServiceTokenProvider tokenProvider;
         private readonly KeyVaultClient keyVaultClient;
-        private readonly DefaultKeyVaultSecretManager secretManager;
+        private TelemetryClient telemetryClient = new TelemetryClient();
+        private static string keyVaultUrl;
 
         public KeyStore(IOptions<AppSettings> appSettings)
         {
             this.appSettings = appSettings;
-            var azureServiceTokenProvider = new AzureServiceTokenProvider(null, appSettings.Value.KeyVaultUrl);
-            this.keyVaultClient = new KeyVaultClient(
+            keyVaultUrl = appSettings.Value.KeyVaultUrl;
+            var tokenProvider = new AzureServiceTokenProvider(null, keyVaultUrl);
+            keyVaultClient = new KeyVaultClient(
                 new KeyVaultClient.AuthenticationCallback(
-                    azureServiceTokenProvider.KeyVaultTokenCallback));
+                    tokenProvider.KeyVaultTokenCallback));
         }
 
         public async Task<EbayOAuthToken> GetEbayUserTokenByCompanyId(long companyId)
         {
-            var secretBundle = await keyVaultClient.GetSecretAsync($"ebay-user-token-company{companyId}");
-            return new EbayOAuthToken
+            try
             {
-                Token = secretBundle.Value,
-                Expiration = secretBundle.Attributes.Expires
-            };
+                var secretBundle = await keyVaultClient.GetSecretAsync(keyVaultUrl, $"ebay-user-token-company{companyId}").ConfigureAwait(false);
+
+                return new EbayOAuthToken
+                {
+                    Token = secretBundle.Value,
+                    Expiration = secretBundle.Attributes.Expires
+                };
+            } catch(Exception ex)
+            {
+                telemetryClient.TrackException(ex);
+            }
+
+            return null;
         }
 
         public async Task<EbayOAuthToken> GetEbayRefreshTokenByCompanyId(long companyId)
         {
-            var secretBundle = await keyVaultClient.GetSecretAsync($"ebay-refresh-token-company{companyId}");
-            return new EbayOAuthToken
+            try
             {
-                Token = secretBundle.Value,
-                Expiration = secretBundle.Attributes.Expires
-            };
+                var secretBundle = await keyVaultClient.GetSecretAsync(keyVaultUrl, $"ebay-refresh-token-company{companyId}").ConfigureAwait(false);
+
+                return new EbayOAuthToken
+                {
+                    Token = secretBundle.Value,
+                    Expiration = secretBundle.Attributes.Expires
+                };
+            }
+            catch (Exception ex)
+            {
+                telemetryClient.TrackException(ex);
+            }
+
+            return null;
         }
     }
 }

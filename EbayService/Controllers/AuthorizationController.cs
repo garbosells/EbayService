@@ -98,9 +98,9 @@ namespace EbayService.Controllers
 
         [HttpGet]
         [Route("api/Authorization/Test")]
-        public void Test()
+        public async void Test()
         {
-            var secret = keyStore.GetEbayUserTokenByCompanyId(0);
+            var secret = await keyStore.GetEbayRefreshTokenByCompanyId(0);
             var x = secret;
         }
     }
