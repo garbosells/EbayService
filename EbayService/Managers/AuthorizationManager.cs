@@ -14,30 +14,33 @@ namespace EbayService.Managers
     {
         TelemetryClient telemetryClient = new TelemetryClient();
         private readonly IOptions<AppSettings> settings;
+        private readonly IKeyManager keyManager;
 
-        public AuthorizationManager(IOptions<AppSettings> settings)
+        public AuthorizationManager(IOptions<AppSettings> settings, IKeyManager keyManager)
         {
             this.settings = settings;
+            this.keyManager = keyManager;
         }
 
-        public void SetEbayAuth(OAuthToken userToken, OAuthToken refreshToken )
+        public void SetEbayAuth(OAuthToken userToken, OAuthToken refreshToken, long companyId)
         {
-            var UserToken = new EbayOAuthToken {
-                Token = userToken.Token,
-                Expiration = userToken.ExpiresOn
-            };
-            var RefreshToken = new EbayOAuthToken
-            {
-                Token = refreshToken.Token,
-                Expiration = refreshToken.ExpiresOn
-            };
             var auth = new EbayAuth
             {
-                UserToken = UserToken,
-                RefreshToken = RefreshToken
+                UserToken = new EbayOAuthToken
+                {
+                    Token = userToken.Token,
+                    Expiration = userToken.ExpiresOn,
+                    Type = EbayOAuthTokenType.USERTOKEN
+                },
+                RefreshToken = new EbayOAuthToken
+                {
+                    Token = refreshToken.Token,
+                    Expiration = refreshToken.ExpiresOn,
+                    Type = EbayOAuthTokenType.REFRESHTOKEN
+                }
             };
-            
-            
+
+            keyManager.SetEbayAuthByCompanyId(companyId, auth);
         }
     }
 }

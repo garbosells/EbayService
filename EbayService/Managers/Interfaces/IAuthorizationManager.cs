@@ -8,6 +8,6 @@ namespace EbayService.Managers.Interfaces
 {
     public interface IAuthorizationManager
     {
-        void SetEbayAuth(OAuthToken userToken, OAuthToken refreshToken);
+        void SetEbayAuth(OAuthToken userToken, OAuthToken refreshToken, long companyId);
     }
 }

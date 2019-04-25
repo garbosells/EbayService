@@ -39,7 +39,7 @@ namespace EbayService
     {
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
       services.Configure<AppSettings>(Configuration);
-      services.AddTransient<KeyStore>();
+      services.AddTransient<IKeyManager, KeyManager>();
       services.AddTransient<IAuthorizationManager, AuthorizationManager>();
     }
 
