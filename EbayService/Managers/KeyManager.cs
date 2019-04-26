@@ -29,6 +29,7 @@ namespace EbayService.Util
             keyVaultClient = new KeyVaultClient(
                 new KeyVaultClient.AuthenticationCallback(
                     tokenProvider.KeyVaultTokenCallback));
+            keyVaultClient.HttpClient.BaseAddress =new Uri(keyVaultUrl);
         }
 
         public bool SetEbayAuthByCompanyId(long companyId, EbayAuth auth)
@@ -97,7 +98,7 @@ namespace EbayService.Util
 
                 var secretAttributes = new SecretAttributes
                 {
-                    Expires = token.Expiration
+                    Expires = token.Expiration.Value.ToUniversalTime()
                 };
 
                 //check to see if identifier exists
@@ -107,7 +108,7 @@ namespace EbayService.Util
                     await keyVaultClient.SetSecretAsync(appSettings.Value.KeyVaultUrl, secretIdentifier, token.Token, null, null, secretAttributes);
                 } else //exists, update it
                 {
-                    await keyVaultClient.UpdateSecretAsync(secretIdentifier, null, secretAttributes, null);
+                    await keyVaultClient.SetSecretAsync(keyVaultUrl, secretIdentifier, token.Token, null, null, secretAttributes);
                 }
 
                 return true;
