@@ -42,5 +42,10 @@ namespace EbayService.Managers
 
             keyManager.SetEbayAuthByCompanyId(companyId, auth);
         }
+
+        public async Task<EbayOAuthToken> GetTokenByCompanyId(long companyId)
+        {
+            return await keyManager.GetEbayUserTokenByCompanyId(companyId).ConfigureAwait(false);
+        }
     }
 }

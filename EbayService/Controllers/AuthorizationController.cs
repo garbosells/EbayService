@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using EbayService.Managers.Interfaces;
 using Microsoft.Extensions.Configuration;
 using EbayService.Util;
+using EbayService.Models;
 
 namespace EbayService.Controllers
 {

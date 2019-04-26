@@ -1,4 +1,6 @@
-﻿using EbayService.Managers.Interfaces;
+﻿using eBay.ApiClient.Auth.OAuth2;
+using eBay.ApiClient.Auth.OAuth2.Model;
+using EbayService.Managers.Interfaces;
 using EbayService.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.Azure.KeyVault;
@@ -29,7 +31,7 @@ namespace EbayService.Util
             keyVaultClient = new KeyVaultClient(
                 new KeyVaultClient.AuthenticationCallback(
                     tokenProvider.KeyVaultTokenCallback));
-            keyVaultClient.HttpClient.BaseAddress =new Uri(keyVaultUrl);
+            keyVaultClient.HttpClient.BaseAddress = new Uri(keyVaultUrl);
         }
 
         public bool SetEbayAuthByCompanyId(long companyId, EbayAuth auth)
@@ -55,7 +57,11 @@ namespace EbayService.Util
         {
             try
             {
-                return await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(false);
+                var token = await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(false);
+                if (token.Expiration.Value.ToUniversalTime() <= DateTime.Now.AddMinutes(-15).ToUniversalTime()) //15 minute buffer
+                    return await RefreshUserToken(companyId);
+                else
+                    return token;
             }
             catch (Exception ex)
             {
@@ -103,10 +109,11 @@ namespace EbayService.Util
 
                 //check to see if identifier exists
                 var versionList = await keyVaultClient.GetSecretVersionsAsync(appSettings.Value.KeyVaultUrl, secretIdentifier);
-                if(!versionList.Any())
+                if (!versionList.Any())
                 {
                     await keyVaultClient.SetSecretAsync(appSettings.Value.KeyVaultUrl, secretIdentifier, token.Token, null, null, secretAttributes);
-                } else //exists, update it
+                }
+                else //exists, update it
                 {
                     await keyVaultClient.SetSecretAsync(keyVaultUrl, secretIdentifier, token.Token, null, null, secretAttributes);
                 }
@@ -139,6 +146,29 @@ namespace EbayService.Util
                 telemetryClient.TrackException(ex);
             }
             return null;
+        }
+
+        private async Task<EbayOAuthToken> RefreshUserToken(long companyId)
+        {
+            try
+            {
+                OAuth2Api oAuth = new OAuth2Api();
+                var refreshToken = await GetEbayRefreshTokenByCompanyId(companyId);
+                var newUserAccessToken = oAuth.GetAccessToken(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, refreshToken.Token, new List<string> { "https://api.ebay.com/oauth/api_scope/sell.inventory" });
+                var newUserToken = new EbayOAuthToken
+                {
+                    Token = newUserAccessToken.AccessToken.Token,
+                    Expiration = newUserAccessToken.AccessToken.ExpiresOn.ToUniversalTime(),
+                    Type = EbayOAuthTokenType.USERTOKEN
+                };
+                await SetEbayTokenByCompanyId(companyId, newUserToken);
+                return newUserToken;
+            }
+            catch (Exception ex)
+            {
+                telemetryClient.TrackException(ex);
+                return null;
+            }
         }
     }
 }
