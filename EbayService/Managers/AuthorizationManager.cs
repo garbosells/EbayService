@@ -24,23 +24,30 @@ namespace EbayService.Managers
 
         public void SetEbayAuth(OAuthToken userToken, OAuthToken refreshToken, long companyId)
         {
-            var auth = new EbayAuth
+            try
             {
-                UserToken = new EbayOAuthToken
+                var auth = new EbayAuth
                 {
-                    Token = userToken.Token,
-                    Expiration = userToken.ExpiresOn,
-                    Type = EbayOAuthTokenType.USERTOKEN
-                },
-                RefreshToken = new EbayOAuthToken
-                {
-                    Token = refreshToken.Token,
-                    Expiration = refreshToken.ExpiresOn,
-                    Type = EbayOAuthTokenType.REFRESHTOKEN
-                }
-            };
+                    UserToken = new EbayOAuthToken
+                    {
+                        Token = userToken.Token,
+                        Expiration = userToken.ExpiresOn,
+                        Type = EbayOAuthTokenType.USERTOKEN
+                    },
+                    RefreshToken = new EbayOAuthToken
+                    {
+                        Token = refreshToken.Token,
+                        Expiration = refreshToken.ExpiresOn,
+                        Type = EbayOAuthTokenType.REFRESHTOKEN
+                    }
+                };
 
-            keyManager.SetEbayAuthByCompanyId(companyId, auth);
+                keyManager.SetEbayAuthByCompanyId(companyId, auth);
+            }
+            catch(Exception ex)
+            {
+                telemetryClient.TrackException(ex);
+            }
         }
 
         public async Task<EbayOAuthToken> GetTokenByCompanyId(long companyId)
