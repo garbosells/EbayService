@@ -84,20 +84,18 @@ namespace EbayService.Controllers
                 authorizationManager.SetEbayAuth(response.AccessToken, response.RefreshToken, state);
                 result.StatusCode = StatusCodes.Status200OK;
                 result.ViewName = "AuthSuccess";
+                return result;
             }
             catch (NotAuthorizedException ex)
             {
-                result.StatusCode = StatusCodes.Status401Unauthorized;
-                result.ViewName = "AuthError";
                 telemetryClient.TrackException(ex, new Dictionary<string, string> { { "ErrorMessage", ex.Message } });
             }
             catch (Exception ex)
             {
-                result.StatusCode = StatusCodes.Status500InternalServerError;
-                result.ViewName = "AuthError";
                 telemetryClient.TrackException(ex, new Dictionary<string, string> { { "ErrorMessage", response?.ErrorMessage } });
             }
-
+            result.StatusCode = StatusCodes.Status500InternalServerError;
+            result.ViewName = "AuthError";
             return result;
         }
     }
