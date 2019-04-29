@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using EbayService.Managers.Interfaces;
 using EbayService.Models;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
@@ -16,20 +17,22 @@ namespace EbayService.Controllers
     {
         TelemetryClient telemetryClient = new TelemetryClient();
         private readonly IOptions<AppSettings> settings;
+        private readonly IAuthorizationManager authorizationManager;
 
-        public LocationController(IOptions<AppSettings> settings)
+        public LocationController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager)
         {
             this.settings = settings;
+            this.authorizationManager = authorizationManager;
         }
 
         // GET api/GetLocations
         [HttpGet]
         [Route("api/Location/GetAllLocations")]
-        public async Task<ActionResult<EbayLocationResponse>> GetLocationsAsync()
+        public async Task<ActionResult<EbayLocationResponse>> GetLocationsAsync(long companyId)
         {
             telemetryClient.TrackEvent("GetLocations");
             string baseUrl = settings.Value.EbayBaseURL;
-            string authToken = string.Empty; //settings.Value.EbayAuth["UserToken"]; TODO: fix
+            string authToken = authorizationManager.GetTokenByCompanyId(companyId).Result.Token;
 
             using (HttpClient client = new HttpClient())
             {
