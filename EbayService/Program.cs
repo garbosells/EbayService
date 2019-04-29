@@ -22,21 +22,7 @@ namespace EbayService
 
         public static IWebHost CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseApplicationInsights()
-            .ConfigureAppConfiguration((context, config) =>
-            {
-                var azureServiceTokenProvider = new AzureServiceTokenProvider();
-                var keyVaultClient = new KeyVaultClient(
-                    new KeyVaultClient.AuthenticationCallback(
-                        azureServiceTokenProvider.KeyVaultTokenCallback));
-
-                config.AddAzureKeyVault(
-                    $"https://ebay-key-vault.vault.azure.net/",
-                    keyVaultClient,
-                    new DefaultKeyVaultSecretManager());
-            })
+                .UseApplicationInsights() 
                 .UseStartup<Startup>().Build();
-
-
     }
 }
