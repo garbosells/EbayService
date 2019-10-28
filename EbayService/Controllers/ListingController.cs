@@ -56,7 +56,7 @@ namespace EbayService.Controllers
 
         [HttpPost]
         [Route("api/Listing/CreateInventoryItem")]
-        public async Task<Response> CreateInventoryItem(string sku, [FromBody] EbayInventoryItem item)
+        public async Task<Response> CreateInventoryItem([FromBody] EbayInventoryItem item)
         {
             try
             {
@@ -66,6 +66,7 @@ namespace EbayService.Controllers
                     product = item.product,
                     availability = item.availability
                 };
+                var sku = Guid.NewGuid().ToString("N").ToUpper();
                 var uri = $"{settings.Value.EbayBaseURL}inventory_item/{sku}";
                 var auth = await authorizationManager.GetTokenByCompanyId(0);
                 var client = new HttpClient();
@@ -77,9 +78,10 @@ namespace EbayService.Controllers
                 var httpResponseMessage = client.PutAsync(uri, content).Result;
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
-                    return new Response
+                    return new CreateInventoryItemResponse
                     {
                         IsSuccess = true,
+                        Sku = sku
                     };
                 }
                 else

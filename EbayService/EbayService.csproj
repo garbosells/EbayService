@@ -57,5 +57,6 @@
     <Compile Remove="Models\ItemModels\Era.cs" />
     <Compile Remove="Models\ItemModels\ShippingDetails.cs" />
     <Compile Remove="Models\ItemModels\ItemDescription.cs" />
+    <Compile Remove="Controllers\ResponseObjects\EbayResponse.cs" />
   </ItemGroup>
 </Project>
