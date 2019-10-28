@@ -58,10 +58,9 @@ namespace EbayService.Util
             try
             {
                 var token = await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(false);
-                if (token.Expiration.Value.ToUniversalTime() <= DateTime.Now.AddMinutes(-15).ToUniversalTime()) //15 minute buffer
+                if (token.Expiration.Value.ToUniversalTime() <= DateTime.Now.AddMinutes(-10).ToUniversalTime()) //15 minute buffer
                     return await RefreshUserToken(companyId);
-                else
-                    return token;
+                return token;
             }
             catch (Exception ex)
             {
@@ -161,7 +160,7 @@ namespace EbayService.Util
                     Expiration = newUserAccessToken.AccessToken.ExpiresOn.ToUniversalTime(),
                     Type = EbayOAuthTokenType.USERTOKEN
                 };
-                await SetEbayTokenByCompanyId(companyId, newUserToken);
+                SetEbayTokenByCompanyId(companyId, newUserToken);
                 return newUserToken;
             }
             catch (Exception ex)

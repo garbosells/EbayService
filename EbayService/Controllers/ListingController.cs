@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using EbayService.Controllers.ResponseObjects;
 using EbayService.Managers.Interfaces;
 using EbayService.Models;
+using ListingService.Models.EbayClasses;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace EbayService.Controllers
 {
@@ -47,6 +52,54 @@ namespace EbayService.Controllers
                 };
             }
             return response;
+        }
+
+        [HttpPost]
+        [Route("api/Listing/CreateInventoryItem")]
+        public async Task<Response> CreateInventoryItem(string sku, [FromBody] EbayInventoryItem item)
+        {
+            try
+            {
+                var myitem = new EbayInventoryItem
+                {
+                    condition = item.condition,
+                    product = item.product,
+                    availability = item.availability
+                };
+                var uri = $"{settings.Value.EbayBaseURL}inventory_item/{sku}";
+                var auth = await authorizationManager.GetTokenByCompanyId(0);
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + auth.Token);
+                var payload = JsonConvert.SerializeObject(myitem);
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                content.Headers.Add("Content-Language", "en-US");
+
+                var httpResponseMessage = client.PutAsync(uri, content).Result;
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new Response
+                    {
+                        IsSuccess = true,
+                    };
+                }
+                else
+                {
+                    return new Response
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = await httpResponseMessage.Content.ReadAsStringAsync() + "\n\n" + payload
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                telemetryClient.TrackException(ex);
+                return new PostListingResponse
+                {
+                    IsSuccess = false,
+                    ErrorMessage = ex.Message
+                };
+            }
         }
     }
 }
