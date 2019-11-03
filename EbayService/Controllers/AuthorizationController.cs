@@ -45,7 +45,7 @@ namespace EbayService.Controllers
             try
             {
                 OAuth2Api oAuth = new OAuth2Api();
-                string url = oAuth.GenerateUserAuthorizationUrl(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, companyId.ToString());
+                string url = oAuth.GenerateUserAuthorizationUrl(OAuthEnvironment.PRODUCTION, new string[] { "https://api.ebay.com/oauth/api_scope/sell.inventory" }, companyId.ToString());
                 return await Task.FromResult<GenerateUserAuthorizationUrlResponse>(new GenerateUserAuthorizationUrlResponse { IsSuccess = true, URL = url });
             }
             catch (Exception ex)
@@ -70,17 +70,14 @@ namespace EbayService.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("api/Authorization/AuthSuccess")]
-        public ActionResult GenerateAuthTokenFromCode(string code, string key, long state)
+        public ActionResult GenerateAuthTokenFromCode(string code, long state)
         {
             OAuthResponse response = null;
             ViewResult result = new ViewResult();
             try
             {
-                if (key != settings.Value.EBayAuthCallbackKey)
-                    throw new NotAuthorizedException($"Callback from: {Request.Host} did not include key.");
-
                 OAuth2Api oAuth = new OAuth2Api();
-                response = oAuth.ExchangeCodeForAccessToken(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, code);
+                response = oAuth.ExchangeCodeForAccessToken(OAuthEnvironment.PRODUCTION, code);
                 authorizationManager.SetEbayAuth(response.AccessToken, response.RefreshToken, state);
                 result.StatusCode = StatusCodes.Status200OK;
                 result.ViewName = "AuthSuccess";

@@ -10,7 +10,7 @@ api.sandbox.ebay.com:
     redirecturi: Erica_Anderson-EricaAnd-GarboS-qjioz
 
 api.ebay.com:
-    appid: <appid-from-developer-portal>
-    certid: <certid-from-developer-portal>
-    devid: <devid-from-developer-portal>
-    redirecturi: <redirect_uri-from-developer-portal>
+    appid: EricaAnd-GarboSel-PRD-2dfed6342-48382a6f
+    certid: PRD-dfed6342f5c7-fdc2-439c-9cf3-b112
+    devid: 502765d1-74be-4ad9-bab0-1afc624ae3d2
+    redirecturi: Erica_Anderson-EricaAnd-GarboS-dinttmk

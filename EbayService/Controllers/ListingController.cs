@@ -5,9 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using EbayService.Controllers.RequestObjects;
 using EbayService.Controllers.ResponseObjects;
 using EbayService.Managers.Interfaces;
 using EbayService.Models;
+using EbayService.Models.EbayClasses;
 using ListingService.Models.EbayClasses;
 using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +28,7 @@ namespace EbayService.Controllers
         private readonly IAuthorizationManager authorizationManager;
         private readonly IConfiguration configuration;
 
+        public string EbayBaseURL = "https://api.ebay.com/sell/inventory/v1/";
         public ListingController(IOptions<AppSettings> settings, IAuthorizationManager authorizationManager, IConfiguration configuration)
         {
             this.settings = settings;
@@ -33,75 +36,134 @@ namespace EbayService.Controllers
             this.configuration = configuration;
         }
 
-        [HttpPost]
-        [Route("api/Listing/")]
-        public async Task<PostListingResponse> PostListing()
-        {
-            PostListingResponse response = null;
-            try
-            {
-
-            }
-            catch (Exception ex)
-            {
-                telemetryClient.TrackException(ex);
-                return new PostListingResponse
-                {
-                    IsSuccess = false,
-                    ErrorMessage = ex.Message
-                };
-            }
-            return response;
-        }
 
         [HttpPost]
-        [Route("api/Listing/CreateInventoryItem")]
-        public async Task<Response> CreateInventoryItem([FromBody] EbayInventoryItem item)
+        [Route("api/Listing/Postlisting")]
+        public string PostListingAsync([FromBody] PostListingRequest request)
         {
             try
             {
                 var myitem = new EbayInventoryItem
                 {
-                    condition = item.condition,
-                    product = item.product,
-                    availability = item.availability
+                    condition = request.inventoryItem.condition,
+                    product = request.inventoryItem.product,
+                    availability = request.inventoryItem.availability
                 };
-                var sku = Guid.NewGuid().ToString("N").ToUpper();
-                var uri = $"{settings.Value.EbayBaseURL}inventory_item/{sku}";
-                var auth = await authorizationManager.GetTokenByCompanyId(0);
-                var client = new HttpClient();
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + auth.Token);
-                var payload = JsonConvert.SerializeObject(myitem);
-                var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                content.Headers.Add("Content-Language", "en-US");
+                var createInventoryItemResponse = CreateEbayInventoryItem(myitem).Result;
+                if ((bool)createInventoryItemResponse.IsSuccess)
+                {
+                    var sku = createInventoryItemResponse.Sku;
+                    var offer = new Offer(request.paymentPolicyId, request.fulfillmentPolicyId, request.returnPolicyId, request.merchantLocationKey, request.price, sku);
+                    offer.categoryId = request.categoryId;
+                    var offerId = CreateOffer(offer).Result.offerId;
+                    var publishOfferResponse = PublishOffer(offerId);
+                    return publishOfferResponse.Result.ListingId;
 
-                var httpResponseMessage = client.PutAsync(uri, content).Result;
-                if (httpResponseMessage.IsSuccessStatusCode)
-                {
-                    return new CreateInventoryItemResponse
-                    {
-                        IsSuccess = true,
-                        Sku = sku
-                    };
                 }
-                else
-                {
-                    return new Response
-                    {
-                        IsSuccess = false,
-                        ErrorMessage = await httpResponseMessage.Content.ReadAsStringAsync() + "\n\n" + payload
-                    };
-                }
+                throw new Exception("Problem generating inventory item.");
+
             }
             catch (Exception ex)
             {
                 telemetryClient.TrackException(ex);
-                return new PostListingResponse
+                //return new PostListingResponse
+                //{
+                //    IsSuccess = false,
+                //    ErrorMessage = ex.Message
+                //};
+                return ex.Message;
+            }
+        }
+
+        private async Task<CreateInventoryItemResponse> CreateEbayInventoryItem(EbayInventoryItem item)
+        {
+            var sku = Guid.NewGuid().ToString("N").ToUpper();
+            var uri = $"{EbayBaseURL}inventory_item/{sku}";
+            var auth = await authorizationManager.GetTokenByCompanyId(0);
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + auth.Token);
+            var payload = JsonConvert.SerializeObject(item);
+            var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            content.Headers.Add("Content-Language", "en-US");
+
+            var httpResponseMessage = client.PutAsync(uri, content).Result;
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                return new CreateInventoryItemResponse
+                {
+                    IsSuccess = true,
+                    Sku = sku
+                };
+            }
+            else
+            {
+                return new CreateInventoryItemResponse
+                {
+                    IsSuccess = false,
+                    ErrorMessage = httpResponseMessage.Content.ReadAsStringAsync().Result
+                };
+            }
+        }
+
+        private async Task<CreateOfferResponse> CreateOffer(Offer offer)
+        {
+            var uri = $"{EbayBaseURL}/offer";
+            var auth = await authorizationManager.GetTokenByCompanyId(0);
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + auth.Token);
+            var payload = JsonConvert.SerializeObject(offer);
+            var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            content.Headers.Add("Content-Language", "en-US");
+
+            var httpResponseMessage = client.PostAsync(uri, content).Result;
+            if (httpResponseMessage.IsSuccessStatusCode)
+            {
+                var response = await httpResponseMessage.Content.ReadAsAsync<CreateOfferResponse>();
+                return response;
+            }
+            return null;
+            //else
+            //{
+            //    return new CreateInventoryItemResponse
+            //    {
+            //        IsSuccess = false,
+            //        ErrorMessage = await httpResponseMessage.Content.ReadAsStringAsync() + "\n\n" + payload
+            //    };
+            //}
+        }
+
+        private async Task<PublishOfferResponse> PublishOffer(string offerId)
+        {
+            try
+            {
+                var uri = $"{EbayBaseURL}offer/{offerId}/publish";
+                var auth = await authorizationManager.GetTokenByCompanyId(0);
+                var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + auth.Token);
+
+                var httpResponseMessage = client.PostAsync(uri, null).Result;
+                var response = httpResponseMessage.Content.ReadAsAsync<PublishOfferResponse>().Result;
+                if (httpResponseMessage.IsSuccessStatusCode)
+                {
+                    return new PublishOfferResponse
+                    {
+                        IsSuccess = true,
+                        ListingId = response.ListingId
+                    };
+                }
+                else
+                {
+                    throw new Exception("Problem while publishing offer: " + httpResponseMessage.Content.ReadAsStringAsync().Result);
+                }
+            } catch (Exception ex)
+            {
+                return new PublishOfferResponse
                 {
                     IsSuccess = false,
                     ErrorMessage = ex.Message
                 };
             }
+            
         }
     }
 }

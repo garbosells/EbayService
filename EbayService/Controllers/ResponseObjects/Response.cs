@@ -7,7 +7,7 @@ namespace EbayService.Controllers.ResponseObjects
 {
   public class Response
   {
-    public bool IsSuccess { get; set; }
+    public bool? IsSuccess { get; set; }
     public string ErrorMessage { get; set; }
   }
 }

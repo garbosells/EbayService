@@ -58,7 +58,9 @@ namespace EbayService.Util
             try
             {
                 var token = await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(false);
-                if (token.Expiration.Value.ToUniversalTime() <= DateTime.Now.AddMinutes(-10).ToUniversalTime()) //15 minute buffer
+                var now = DateTime.Now.AddMinutes(-10).ToUniversalTime();
+                var expUTC = token.Expiration.Value.ToUniversalTime();
+                if (expUTC >= now) //15 minute buffer
                     return await RefreshUserToken(companyId);
                 return token;
             }
