@@ -60,11 +60,12 @@ namespace EbayService.Controllers
                     return publishOfferResponse.Result.ListingId;
 
                 }
-                throw new Exception("Problem generating inventory item.");
+                throw new Exception("Problem generating inventory item: " + createInventoryItemResponse.ErrorMessage);
 
             }
             catch (Exception ex)
             {
+                Response.StatusCode = 400;
                 telemetryClient.TrackException(ex);
                 //return new PostListingResponse
                 //{
@@ -100,7 +101,7 @@ namespace EbayService.Controllers
                 return new CreateInventoryItemResponse
                 {
                     IsSuccess = false,
-                    ErrorMessage = httpResponseMessage.Content.ReadAsStringAsync().Result
+                    ErrorMessage = await httpResponseMessage.Content.ReadAsStringAsync()
                 };
             }
         }

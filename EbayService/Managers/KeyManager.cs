@@ -60,7 +60,7 @@ namespace EbayService.Util
                 var token = await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(false);
                 var now = DateTime.Now.AddMinutes(-10).ToUniversalTime();
                 var expUTC = token.Expiration.Value.ToUniversalTime();
-                if (expUTC >= now) //15 minute buffer
+                if (expUTC <= now) //15 minute buffer
                     return await RefreshUserToken(companyId);
                 return token;
             }
@@ -155,14 +155,14 @@ namespace EbayService.Util
             {
                 OAuth2Api oAuth = new OAuth2Api();
                 var refreshToken = await GetEbayRefreshTokenByCompanyId(companyId);
-                var newUserAccessToken = oAuth.GetAccessToken(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") != "Production" ? OAuthEnvironment.SANDBOX : OAuthEnvironment.PRODUCTION, refreshToken.Token, new List<string> { "https://api.ebay.com/oauth/api_scope/sell.inventory" });
+                var newUserAccessToken = oAuth.GetAccessToken(OAuthEnvironment.PRODUCTION, refreshToken.Token, new List<string> { "https://api.ebay.com/oauth/api_scope/sell.inventory" });
                 var newUserToken = new EbayOAuthToken
                 {
                     Token = newUserAccessToken.AccessToken.Token,
                     Expiration = newUserAccessToken.AccessToken.ExpiresOn.ToUniversalTime(),
                     Type = EbayOAuthTokenType.USERTOKEN
                 };
-                SetEbayTokenByCompanyId(companyId, newUserToken);
+                SetEbayTokenByCompanyId(companyId, newUserToken).Wait();
                 return newUserToken;
             }
             catch (Exception ex)
