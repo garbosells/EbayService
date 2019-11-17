@@ -57,7 +57,7 @@ namespace EbayService.Util
         {
             try
             {
-                var token = await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(false);
+                var token = await GetTokenSecret($"ebay-user-token-company{companyId}", EbayOAuthTokenType.USERTOKEN).ConfigureAwait(true);
                 var now = DateTime.Now.AddMinutes(-10).ToUniversalTime();
                 var expUTC = token.Expiration.Value.ToUniversalTime();
                 if (expUTC <= now) //15 minute buffer
@@ -76,7 +76,8 @@ namespace EbayService.Util
         {
             try
             {
-                return await GetTokenSecret($"ebay-refresh-token-company{companyId}", EbayOAuthTokenType.REFRESHTOKEN).ConfigureAwait(false);
+                var token = await GetTokenSecret($"ebay-refresh-token-company{companyId}", EbayOAuthTokenType.REFRESHTOKEN).ConfigureAwait(true);
+                return token;
             }
             catch (Exception ex)
             {
@@ -133,7 +134,7 @@ namespace EbayService.Util
 
             try
             {
-                var secretBundle = await keyVaultClient.GetSecretAsync(keyVaultUrl, identifier).ConfigureAwait(false);
+                var secretBundle = await keyVaultClient.GetSecretAsync(keyVaultUrl, identifier).ConfigureAwait(true);
 
                 return new EbayOAuthToken
                 {
@@ -155,15 +156,19 @@ namespace EbayService.Util
             {
                 OAuth2Api oAuth = new OAuth2Api();
                 var refreshToken = await GetEbayRefreshTokenByCompanyId(companyId);
-                var newUserAccessToken = oAuth.GetAccessToken(OAuthEnvironment.PRODUCTION, refreshToken.Token, new List<string> { "https://api.ebay.com/oauth/api_scope/sell.inventory" });
-                var newUserToken = new EbayOAuthToken
+                if(refreshToken != null)
                 {
-                    Token = newUserAccessToken.AccessToken.Token,
-                    Expiration = newUserAccessToken.AccessToken.ExpiresOn.ToUniversalTime(),
-                    Type = EbayOAuthTokenType.USERTOKEN
-                };
-                SetEbayTokenByCompanyId(companyId, newUserToken).Wait();
-                return newUserToken;
+                    var newUserAccessToken = oAuth.GetAccessToken(OAuthEnvironment.PRODUCTION, refreshToken.Token, new List<string> { "https://api.ebay.com/oauth/api_scope/sell.inventory" });
+                    var newUserToken = new EbayOAuthToken
+                    {
+                        Token = newUserAccessToken.AccessToken.Token,
+                        Expiration = newUserAccessToken.AccessToken.ExpiresOn.ToUniversalTime(),
+                        Type = EbayOAuthTokenType.USERTOKEN
+                    };
+                    SetEbayTokenByCompanyId(companyId, newUserToken).Wait();
+                    return newUserToken;
+                }
+                throw new Exception("Refresh token was null!");
             }
             catch (Exception ex)
             {

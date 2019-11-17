@@ -52,7 +52,7 @@ namespace EbayService.Managers
 
         public async Task<EbayOAuthToken> GetTokenByCompanyId(long companyId)
         {
-            return await keyManager.GetEbayUserTokenByCompanyId(companyId).ConfigureAwait(false);
+            return await keyManager.GetEbayUserTokenByCompanyId(companyId).ConfigureAwait(true);
         }
     }
 }

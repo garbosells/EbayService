@@ -39,7 +39,7 @@ namespace EbayService.Controllers
 
         [HttpPost]
         [Route("api/Listing/Postlisting")]
-        public string PostListingAsync([FromBody] PostListingRequest request)
+        public async Task<string> PostListingAsync([FromBody] PostListingRequest request)
         {
             try
             {
@@ -56,8 +56,8 @@ namespace EbayService.Controllers
                     var offer = new Offer(request.paymentPolicyId, request.fulfillmentPolicyId, request.returnPolicyId, request.merchantLocationKey, request.price, sku);
                     offer.categoryId = request.categoryId;
                     var offerId = CreateOffer(offer).Result.offerId;
-                    var publishOfferResponse = PublishOffer(offerId);
-                    return publishOfferResponse.Result.ListingId;
+                    var publishOfferResponse = await PublishOffer(offerId);
+                    return publishOfferResponse.ListingId;
 
                 }
                 throw new Exception("Problem generating inventory item: " + createInventoryItemResponse.ErrorMessage);
@@ -144,6 +144,7 @@ namespace EbayService.Controllers
 
                 var httpResponseMessage = client.PostAsync(uri, null).Result;
                 var response = httpResponseMessage.Content.ReadAsAsync<PublishOfferResponse>().Result;
+                var stringResponse = httpResponseMessage.Content.ReadAsStringAsync();
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return new PublishOfferResponse
